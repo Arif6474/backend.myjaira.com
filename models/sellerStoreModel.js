@@ -31,6 +31,13 @@ const sellerStoreSchema = new Schema({
         type: String,
         required: true,
     },
+    isFeatured: {
+        type: Boolean,
+        default: false,
+    },
+    serial:{
+        type: Number,
+    },
     isActive: {
         type: Boolean,
         default: true,

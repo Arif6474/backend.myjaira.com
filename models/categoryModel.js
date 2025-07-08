@@ -4,6 +4,7 @@ const { Schema, model } = mongoose;
 const categorySchema = new Schema({
     name: {
         type: String,
+        required: [true, 'Please provide a category name'],
     },
     slug: {
         type: String,
@@ -11,6 +12,13 @@ const categorySchema = new Schema({
     },
     description: {
         type: String,
+    },
+    image: {
+        type: String,
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false,
     },
     isActive: {
         type: Boolean,

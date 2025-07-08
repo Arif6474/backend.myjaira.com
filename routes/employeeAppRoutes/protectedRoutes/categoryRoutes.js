@@ -8,13 +8,14 @@ import {
     archiveCategory,
     getCategoryWithQuery,
 } from '#controllers/categoryController.js';
+import { upload } from '#utils/storage.js';
 
 const router = Router();
 router.get('/', getAllCategories);
-router.post('/', createCategory);
+router.post('/', upload.fields([{ name: 'image' }]), createCategory);
 router.get('/getCategoryWithQuery', getCategoryWithQuery);
 router.get('/getSingleCategory/:id', getSingleCategory);
-router.patch('/:id', updateCategory);
+router.patch('/:id', upload.fields([{ name: 'image' }]), updateCategory);
 router.delete('/:id', deleteCategory);
 router.patch('/archiveCategory/:id', archiveCategory);
 

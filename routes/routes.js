@@ -5,6 +5,6 @@ import consumerAppRoutes from "./consumerAppRoutes/consumerAppRoutes.js";
 const router = Router();
 
 router.use('/employeeApp', employeeAppRoutes);
-router.use('/consumerApp', consumerAppRoutes);
+router.use('/customerApp', consumerAppRoutes);
 
 export default router;
