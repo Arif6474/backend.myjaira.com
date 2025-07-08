@@ -3,7 +3,7 @@ import path from 'path';
 
 async function deleteFile(key) {
     try {
-        const filePath = path.join(process.cwd(), 'Uploads', key);
+        const filePath = path.join(process.cwd(), 'uploads', key);
         console.log(filePath, 'filePath');
         await fs.unlink(filePath);
     } catch (error) {
