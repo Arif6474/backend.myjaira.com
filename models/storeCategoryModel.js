@@ -9,6 +9,9 @@ const storeCategorySchema = new Schema({
         type: String,
         unique: true,
     },
+    image: {
+        type: String,
+    },
     description: {
         type: String,
     },
