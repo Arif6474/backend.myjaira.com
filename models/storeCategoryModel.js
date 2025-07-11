@@ -12,6 +12,10 @@ const storeCategorySchema = new Schema({
     image: {
         type: String,
     },
+    isFeatured: {
+        type: Boolean,
+        default: false,
+    },
     description: {
         type: String,
     },
