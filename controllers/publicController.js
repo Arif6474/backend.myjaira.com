@@ -23,14 +23,16 @@ const getHomePageData = asyncHandler(async (req, res) => {
 })
 const getAllStores = asyncHandler(async (req, res) => {
     const { itemCategory, storeCategory } = req.query;
-    if(itemCategory) {
+
+    if(itemCategory !== undefined && itemCategory !== '' && itemCategory !== 'null') {
         const category = await categoryModel.findOne({ slug: itemCategory });
         const items = await itemModel.find({ category: category._id }).populate('sellerStore');
         const storeIds = [...new Set(items.map(item => item.sellerStore?._id))];
         const stores =  await sellerStoreModel.find({ _id: { $in: storeIds }, isActive: true }).sort({ serial: 1 });
         return res.status(200).json(stores);
     }
-    if(storeCategory) {
+    if(storeCategory !== undefined && storeCategory !== '' && storeCategory !== 'null') {
+        console.log(storeCategory, 'storeCategory');
         const category = await storeCategoryModel.findOne({ slug: storeCategory });
         const stores = await sellerStoreModel.find({ storeCategory: category._id, isActive: true }).sort({ serial: 1 });
         return res.status(200).json(stores);
