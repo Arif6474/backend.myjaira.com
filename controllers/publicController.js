@@ -64,7 +64,7 @@ const getStoreBySlugWithCategories = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "Category not found" });
     }
 
-    const singleStoreItems = await itemModel.find({ sellerStore: singleStore._id, category: category._id }).populate('category').sort({ createdAt: -1 });
+    const singleStoreItems = await itemModel.find({ sellerStore: singleStore._id, category: category._id }).populate('category').sort({ serial: 1 });
 
     res.status(200).json({
         singleStore,

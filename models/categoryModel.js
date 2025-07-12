@@ -20,6 +20,9 @@ const categorySchema = new Schema({
         type: Boolean,
         default: false,
     },
+    serial: {
+        type: Number,
+    },
     isActive: {
         type: Boolean,
         default: true,

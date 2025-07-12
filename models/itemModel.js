@@ -37,6 +37,9 @@ const itemSchema = new Schema({
     link: {
         type: String,
     },
+    serial:{
+        type: Number,
+    },
     isActive: {
         type: Boolean,
         default: true,
