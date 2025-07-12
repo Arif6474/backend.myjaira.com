@@ -73,9 +73,21 @@ const getStoreBySlugWithCategories = asyncHandler(async (req, res) => {
     });
 });
 
+const getAllStoreCategories = asyncHandler(async (req, res) => {
+    const storeCategories = await storeCategoryModel.find({ isActive: true }).sort({ serial: 1 });
+    res.status(200).json(storeCategories);
+})
+
+const getAllItemCategories = asyncHandler(async (req, res) => {
+    const categories = await categoryModel.find({ isActive: true }).sort({ serial: 1 });
+    res.status(200).json(categories);
+})
+
 export {
     getHomePageData,
     getAllStores,
     getStoreBySlug,
-    getStoreBySlugWithCategories
+    getStoreBySlugWithCategories,
+    getAllStoreCategories,
+    getAllItemCategories
 }
