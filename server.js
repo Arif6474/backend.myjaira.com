@@ -8,6 +8,7 @@ import routes from '#routes/routes.js';
 import { errorHandler } from '#middlewares/errorMiddleware.js';
 import itemModel from '#models/itemModel.js';
 import { products } from './products.js';
+import storeItemCategoryModel from '#models/storeItemCategoryModel.js';
 
 dotenv.config();
 connectDB();
@@ -47,7 +48,58 @@ app.use(express.json());
   
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
+
+// async function migrateItemsToStoreItemCategories() {
+//     try {
+
+//       const uniquePairs = await itemModel.aggregate([
+//         {
+//           $group: {
+//             _id: {
+//               sellerStore: '$sellerStore',
+//               category: '$category',
+//             },
+//           },
+//         },
+//       ]);
+  
+//       console.log(`🔍 Found ${uniquePairs.length} unique sellerStore-category pairs`);
+  
+//       for (const pair of uniquePairs) {
+//         const { sellerStore, category } = pair._id;
+  
+//         // Step 2: Check if it already exists in StoreItemCategory
+//         const exists = await storeItemCategoryModel.findOne({
+//           sellerStore,
+//           category,
+//         });
+  
+//         if (!exists) {
+//           await storeItemCategoryModel.create({
+//             sellerStore,
+//             category,
+//             isActive: true,
+//           });
+//           console.log(`✅ Inserted: sellerStore=${sellerStore}, category=${category}`);
+//         } else {
+//           console.log(`⏭ Already exists: sellerStore=${sellerStore}, category=${category}`);
+//         }
+//       }
+  
+//       console.log('🎉 Migration complete');
+//     } catch (err) {
+//       console.error('❌ Migration failed', err);
+//     } 
+//   }
+  
+
+  
+
 app.use('/api', routes);
+// app.get('/migrate-items', async (req, res) => {
+//     await migrateItemsToStoreItemCategories();
+//     res.status(200).json({ message: 'Migration completed' });
+// });
 // app.get('/seed-items', seedItems);
 
 app.use(errorHandler);

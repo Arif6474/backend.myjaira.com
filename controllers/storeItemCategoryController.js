@@ -29,7 +29,23 @@ const archiveStoreItemCategory = asyncHandler(async (req, res) => {
 });
 
 const getStoreItemCategoryWithQuery = asyncHandler(async (req, res) => {
-    await getDocumentsWithQuery({ model: StoreItemCategory, req, res });
+    // await getDocumentsWithQuery({ model: StoreItemCategory, req, res });
+    const { search, page = 1, limit = 10 } = req.query;
+    const filters = req.query.filters ? JSON.parse(req.query.filters) : {}
+    const skip = (page - 1) * limit;
+    const total = await StoreItemCategory.countDocuments(filters);
+    const categories = await StoreItemCategory.find(filters)
+        .skip(skip)
+        .limit(Number(limit))
+        .sort({ createdAt: -1 })
+        .populate('category')
+    res.status(200).json({
+        totalItems: total,
+        totalPages: Math.ceil(total / limit),
+        currentPage: Number(page),
+        pageSize: Number(limit),
+        documents: categories
+    });
 })
 
 export {
