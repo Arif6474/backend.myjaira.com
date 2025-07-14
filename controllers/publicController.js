@@ -22,31 +22,80 @@ const getHomePageData = asyncHandler(async (req, res) => {
 
     })
 })
+// const getAllStores = asyncHandler(async (req, res) => {
+//     const { itemCategory, storeCategory } = req.query;
+
+//     if(itemCategory !== undefined && itemCategory !== '' && itemCategory !== 'null') {
+//         const category = await categoryModel.findOne({ slug: itemCategory });
+//         const items = await itemModel.find({ category: category._id }).populate('sellerStore');
+//         const storeIds = [...new Set(items.map(item => item.sellerStore?._id))];
+//         const stores =  await sellerStoreModel.find({ _id: { $in: storeIds }, isActive: true }).sort({ serial: 1 });
+//         return res.status(200).json(stores);
+//     }
+//     if(storeCategory !== undefined && storeCategory !== '' && storeCategory !== 'null') {
+//         const category = await storeCategoryModel.findOne({ slug: storeCategory });
+
+//         const storeItemSubcategories = await storeItemSubcategoryModel.find({storeCategory : category._id, isActive: true })
+//         const categoryIds = [...new Set(storeItemSubcategories.map(subcategory => subcategory.category))]
+//         const items =await itemModel.find({ category: { $in: categoryIds } })
+//         const sellerStoreIds = [...new Set(items.map(store => store.sellerStore))];
+//         const stores = await sellerStoreModel.find({ _id: { $in: sellerStoreIds }, isActive: true }).sort({ serial: 1 });
+
+//         return res.status(200).json(stores);
+//     }
+//     const stores = await sellerStoreModel.find({ isActive: true }).sort({ serial: 1 })
+//     res.status(200).json(stores)
+// })
 const getAllStores = asyncHandler(async (req, res) => {
     const { itemCategory, storeCategory } = req.query;
-
-    if(itemCategory !== undefined && itemCategory !== '' && itemCategory !== 'null') {
-        const category = await categoryModel.findOne({ slug: itemCategory });
-        const items = await itemModel.find({ category: category._id }).populate('sellerStore');
-        const storeIds = [...new Set(items.map(item => item.sellerStore?._id))];
-        const stores =  await sellerStoreModel.find({ _id: { $in: storeIds }, isActive: true }).sort({ serial: 1 });
-        return res.status(200).json(stores);
+  
+    const isValidQuery = (value) =>
+      value !== undefined && value !== '' && value !== 'null';
+  
+    // 🟡 Filter by itemCategory
+    if (isValidQuery(itemCategory)) {
+      const category = await categoryModel.findOne({ slug: itemCategory });
+      if (!category) return res.status(200).json([]);
+  
+      const items = await itemModel.find({ category: category._id }).populate('sellerStore');
+      const storeIds = [
+        ...new Set(items.map((item) => item.sellerStore?._id).filter(Boolean)),
+      ];
+  
+      const stores = await sellerStoreModel
+        .find({ _id: { $in: storeIds }, isActive: true })
+        .sort({ serial: 1 });
+  
+      return res.status(200).json(stores);
     }
-    if(storeCategory !== undefined && storeCategory !== '' && storeCategory !== 'null') {
-        const category = await storeCategoryModel.findOne({ slug: storeCategory });
-
-        const storeItemSubcategories = await storeItemSubcategoryModel.find({storeCategory : category._id, isActive: true })
-        const categoryIds = [...new Set(storeItemSubcategories.map(subcategory => subcategory.category))]
-        const items =await itemModel.find({ category: { $in: categoryIds } })
-        const sellerStoreIds = [...new Set(items.map(store => store.sellerStore))];
-        const stores = await sellerStoreModel.find({ _id: { $in: sellerStoreIds }, isActive: true }).sort({ serial: 1 });
-
-        return res.status(200).json(stores);
+  
+    // 🟡 Filter by storeCategory
+    if (isValidQuery(storeCategory)) {
+      const category = await storeCategoryModel.findOne({ slug: storeCategory });
+      if (!category) return res.status(200).json([]);
+  
+      const subcategories = await storeItemSubcategoryModel.find({
+        storeCategory: category._id,
+        isActive: true,
+      });
+  
+      const categoryIds = [...new Set(subcategories.map((sc) => sc.category).filter(Boolean))];
+  
+      const items = await itemModel.find({ category: { $in: categoryIds } });
+      const sellerStoreIds = [...new Set(items.map((item) => item.sellerStore).filter(Boolean))];
+  
+      const stores = await sellerStoreModel
+        .find({ _id: { $in: sellerStoreIds }, isActive: true })
+        .sort({ serial: 1 });
+  
+      return res.status(200).json(stores);
     }
-    const stores = await sellerStoreModel.find({ isActive: true }).sort({ serial: 1 })
-    res.status(200).json(stores)
-})
-
+  
+    // 🟡 Default: All active stores
+    const stores = await sellerStoreModel.find({ isActive: true }).sort({ serial: 1 });
+    res.status(200).json(stores);
+  });
+  
 
 const getStoreBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
