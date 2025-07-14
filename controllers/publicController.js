@@ -113,7 +113,7 @@ const getStoreBySlug = asyncHandler(async (req, res) => {
     const categoryIds = [...new Set(items.map(item => item.category?.toString()))].filter(Boolean);
 
     // 4. (Optional) Populate full category info
-    const categories = await categoryModel.find({ _id: { $in: categoryIds } });
+    const categories = await categoryModel.find({ _id: { $in: categoryIds }, isActive: true }).sort({ serial: 1 });
 
     res.status(200).json({
         store,
