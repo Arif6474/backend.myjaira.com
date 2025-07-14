@@ -3,6 +3,7 @@ import categoryModel from '#models/categoryModel.js'
 import itemModel from '#models/itemModel.js';
 import sellerStoreModel from '#models/sellerStoreModel.js';
 import storeCategoryModel from '#models/storeCategoryModel.js';
+import storeItemSubcategoryModel from '#models/storeItemSubcategoryModel.js';
 import Testimonial from '#models/testimonialModel.js'
 import asyncHandler from 'express-async-handler'
 
@@ -32,9 +33,14 @@ const getAllStores = asyncHandler(async (req, res) => {
         return res.status(200).json(stores);
     }
     if(storeCategory !== undefined && storeCategory !== '' && storeCategory !== 'null') {
-        console.log(storeCategory, 'storeCategory');
         const category = await storeCategoryModel.findOne({ slug: storeCategory });
-        const stores = await sellerStoreModel.find({ storeCategory: category._id, isActive: true }).sort({ serial: 1 });
+
+        const storeItemSubcategories = await storeItemSubcategoryModel.find({storeCategory : category._id, isActive: true })
+        const categoryIds = [...new Set(storeItemSubcategories.map(subcategory => subcategory.category))]
+        const items =await itemModel.find({ category: { $in: categoryIds } })
+        const sellerStoreIds = [...new Set(items.map(store => store.sellerStore))];
+        const stores = await sellerStoreModel.find({ _id: { $in: sellerStoreIds }, isActive: true }).sort({ serial: 1 });
+
         return res.status(200).json(stores);
     }
     const stores = await sellerStoreModel.find({ isActive: true }).sort({ serial: 1 })

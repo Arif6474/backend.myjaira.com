@@ -9,6 +9,7 @@ import storeItemCategoryRoutes from './storeItemCategoryRoutes.js'
 import sellerStoreRoutes from './sellerStoreRoutes.js'
 import categoryRoutes from './categoryRoutes.js'
 import itemRoutes from './itemRoutes.js'
+import storeItemSubcategoryRoutes from './storeItemSubcategoryRoutes.js'
 
 
 const protectedRoutes = Router()
@@ -23,5 +24,6 @@ protectedRoutes.use('/sellerStores', sellerStoreRoutes)
 protectedRoutes.use('/storeItemCategories', storeItemCategoryRoutes)
 protectedRoutes.use('/categories', categoryRoutes)
 protectedRoutes.use('/items', itemRoutes)
+protectedRoutes.use('/storeItemSubcategories', storeItemSubcategoryRoutes)
 
 export default protectedRoutes
