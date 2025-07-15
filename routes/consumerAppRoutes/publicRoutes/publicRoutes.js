@@ -2,10 +2,11 @@ import { Router } from 'express'
 import newsletterRoutes from './newsletterRoutes.js'
 
 import { getAllStores, getHomePageData, getStoreBySlug, getStoreBySlugWithCategories, getAllStoreCategories, getAllItemCategories } from '#controllers/publicController.js'
+import authRoutes from './authRoutes/authRoutes.js'
 
 
 const publicRoutes = Router()
-
+publicRoutes.use('/auth', authRoutes)
 publicRoutes.use('/newsletter', newsletterRoutes)
 
 publicRoutes.get('/getHomePageData', getHomePageData)
