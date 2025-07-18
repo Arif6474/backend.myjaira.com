@@ -70,6 +70,12 @@ export async function sendEmployeeInvitationEmail(recepient, link) {
 
   await sendEmailWithResend(recepient, 'Test App', message)
 }
+export async function sendSellerInvitationEmail(recepient, link) {
+
+  const message = `<p>Click <a href="${link}">Here</a><br> Valid For 24 Hours</p>`
+
+  await sendEmailWithResend(recepient, 'Test App', message)
+}
 export async function sendConsultancyRequestEmail(newConsultancyRequest) {
   const { name, email, phone, subject, message } = newConsultancyRequest;
 

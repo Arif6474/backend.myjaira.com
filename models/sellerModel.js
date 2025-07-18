@@ -22,6 +22,12 @@ const sellerSchema = new Schema({
     password: {
         type: String,
     },
+    level: {
+        type: String,
+        enum: ['superAdmin', 'admin', 'member'],
+        required: [true, 'Please add a Level'],
+        default: 'member',
+    },
     isActive: {
         type: Boolean,
         default: true,
