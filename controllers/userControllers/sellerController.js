@@ -29,7 +29,7 @@ const loginSeller = asyncHandler (async (req,res) => {
     // Check if password matches
     if (seller && (await compare(password, seller.password))) {
         res.status(200).json({
-            _id: seller.id,
+            _id: seller._id,
             name: seller.name,
             email: seller.email,
             level: seller.level,
@@ -155,7 +155,7 @@ const forgotSellerPassword = asyncHandler (async (req,res) => {
     const token = generateToken(isExistSeller._id)
 
     //send mail
-    const link = process.env.ADMIN_APP_LINK + 'auth/resetPassword/' + token
+    const link = process.env.SELLER_APP_LINK + 'auth/resetPassword/' + token
 
     const sendMail = await sendForgotPasswordMail(isExistSeller.email, link)
 
