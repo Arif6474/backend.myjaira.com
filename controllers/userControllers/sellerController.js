@@ -6,7 +6,7 @@ import { generateToken } from '#utils/helperFunction.js'
 import SellerInvite from '#models/sellerInviteModel.js'
 import { sendForgotPasswordMail } from '#config/email/emailFormats/sendMail.js'
 import { getDocumentsWithQuery } from '#crudServices/crudServices.js'
-
+import SellerRequest from '#models/sellerRequestModel.js'
 const { genSalt, hash, compare } = bcrypt
 const { verify } = jwt
 
@@ -15,13 +15,13 @@ const getAllSellerWithQuery = asyncHandler(async (req, res) => {
     await getDocumentsWithQuery({ model: Seller, req, res });
 })
 // Login Seller
-const loginSeller = asyncHandler (async (req,res) => {
+const loginSeller = asyncHandler(async (req, res) => {
 
-    const {email, password} = req.body
+    const { email, password } = req.body
 
-    const seller = await Seller.findOne({email})
+    const seller = await Seller.findOne({ email })
 
-    if(!seller) {
+    if (!seller) {
         res.status(400)
         throw new Error('No seller found with this email')
     }
@@ -44,27 +44,27 @@ const loginSeller = asyncHandler (async (req,res) => {
 })
 
 // Register Seller
-const registerSeller = asyncHandler (async (req,res) => {
-    const {name, email, password} = req.body
-    
+const registerSeller = asyncHandler(async (req, res) => {
+    const { name, email, phone, password } = req.body
+
     // if(!req.file) {
     //     res.status(400)
     //     throw new Error('Please add an image')
     // }
 
     //Seller Email Present Or Not
-    const isExistSeller = await Seller.findOne({email})
+    const isExistSeller = await Seller.findOne({ email })
 
     if (isExistSeller) {
         res.status(400)
         throw new Error('Seller already exists with this email')
     }
 
-    const sellerInvitation =await SellerInvite.findOne({email});
-    if(!sellerInvitation){
-        res.status(400)
-        throw new Error('Seller invitation not found')
-    }
+    // const sellerInvitation =await SellerInvite.findOne({email});
+    // if(!sellerInvitation){
+    //     res.status(400)
+    //     throw new Error('Seller invitation not found')
+    // }
 
     // Hash Password
     const salt = await genSalt(10)
@@ -73,23 +73,23 @@ const registerSeller = asyncHandler (async (req,res) => {
     const seller = await Seller.create({
         name,
         email,
-        level:'seller',
+        phone,
+        level: 'seller',
         password: hashedPassword,
         // image: req.file.path
     })
 
     if (seller) {
-        await SellerInvite.deleteOne({ email });
-        
+
         return res.status(201).json({
-          _id: seller.id,
-          name: seller.name,
-          email: seller.email,
-          level: seller.level,
-          // dp: seller.dp,
-          token: generateToken(seller._id),
+            _id: seller._id,
+            name: seller.name,
+            email: seller.email,
+            phone: seller.phone,
+            level: seller.level,
+            token: generateToken(seller._id),
         });
-      }
+    }
     else {
         res.status(400)
         throw new Error('Invalid Seller Data')
@@ -97,26 +97,26 @@ const registerSeller = asyncHandler (async (req,res) => {
 })
 
 // change Seller Password
-const changeSellerPassword = asyncHandler (async (req,res) => {
+const changeSellerPassword = asyncHandler(async (req, res) => {
 
     const { oldPassword, newPassword } = req.body;
-    const {_id, email} = req.seller
+    const { _id, email } = req.seller
 
-    if(!oldPassword || !newPassword) {
+    if (!oldPassword || !newPassword) {
         res.status(400)
         throw new Error('Please add all fields')
     }
 
     // Check for seller email
-    const seller = await Seller.findOne({email})
+    const seller = await Seller.findOne({ email })
 
-    if(!seller) {
+    if (!seller) {
         res.status(400)
         throw new Error('No seller found with this email!!')
     }
 
     const checkPassword = await compare(oldPassword, seller.password)
-    
+
     if (!checkPassword) {
         res.status(400)
         throw new Error('Old Password does not match')
@@ -136,18 +136,18 @@ const changeSellerPassword = asyncHandler (async (req,res) => {
 })
 
 // seller forgot password
-const forgotSellerPassword = asyncHandler (async (req,res) => {
-    const {email} = req.body
+const forgotSellerPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body
 
     if (!email) {
         res.status(400)
         throw new Error('Please add an email')
     }
-    
-    //Seller Present Or Not
-    const isExistSeller = await Seller.findOne({email});
 
-    if(!isExistSeller){
+    //Seller Present Or Not
+    const isExistSeller = await Seller.findOne({ email });
+
+    if (!isExistSeller) {
         res.status(400)
         throw new Error('No seller found with this email!!')
     }
@@ -168,7 +168,7 @@ const forgotSellerPassword = asyncHandler (async (req,res) => {
 })
 
 // Reset Seller Password
-const resetSellerPassword = asyncHandler (async (req,res) => {
+const resetSellerPassword = asyncHandler(async (req, res) => {
     const { token, newPassword } = req.body;
 
     if (!newPassword) {
@@ -202,20 +202,16 @@ const resetSellerPassword = asyncHandler (async (req,res) => {
 
 
 // get email from token
-const getEmailFromToken = asyncHandler (async (req,res) => {
+const getEmailFromToken = asyncHandler(async (req, res) => {
     const { token } = req.params
 
     const decoded = verify(token, process.env.JWT_SECRET);
 
-    const invite = await SellerInvite.findOne({_id: decoded.id});
+    const invite = await SellerRequest.findOne({ _id: decoded.id });
 
-    if(invite) {
+    if (invite) {
 
-        const {email} = invite
-
-        res.status(201).json({
-            email
-        })
+        res.status(201).json(invite)
 
     } else {
         res.status(400)

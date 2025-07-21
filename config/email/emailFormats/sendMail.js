@@ -1,3 +1,4 @@
+
 import { RECEPIENTS } from "../../../constants.js"
 import { sendEmailWithResend } from "../sendEmailWithResend.js"
 
@@ -101,23 +102,30 @@ export async function sendConsultancyRequestEmail(newConsultancyRequest) {
   await sendEmailWithResend(RECEPIENTS, 'ENN Consultancy Request', htmlMessage);
 }
 
+export async function sendSellerConfirmationEmail(email, name, link) {
 
-export async function sendConsultancyAcknowledgementToSender(senderEmail, senderName) {
   const htmlMessage = `
     <div style="font-family: Arial, sans-serif; padding: 20px; color: #ffffff;">
       <div style="max-width: 600px; margin: auto; background-color: #000024; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid #333;">
         <div style="background-color: #111132; padding: 20px;">
-          <h2 style="color: #ffffff; margin: 0; text-align: center;">Consultancy Request Received</h2>
+          <h2 style="color: #ffffff; margin: 0; text-align: center;">Seller Request Confirmation</h2>
         </div>
-        <div style="padding: 20px;">
-          <p>Dear ${senderName || 'Valued Client'},</p>
-          <p>Thank you for reaching out to ENN Consultancy.</p>
-          <p>We have successfully received your request and one of our consultants will get back to you shortly. If your inquiry is urgent, feel free to contact us directly at <a href="evisa0104@gmail.com" style="color: #a7c5ff;">evisa0104@gmail.com</a>.</p>
-          <p style="margin-top: 30px;">Best regards,<br/>The ENN Consultancy Team</p>
+        <div style="padding: 20px; color: #ffffff;">
+          <p style="color: #ffffff;"><strong>Name:</strong> ${name}</p>
+          <p style="color: #ffffff;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #a7c5ff;">${email}</a></p>
+          
+          <p style="color: #ffffff;">Thank you for your seller request. Please complete your registration by clicking the button below:</p>
+          
+          <a href="${link}" target="_blank"
+             style="display: inline-block; background-color: #F87315; color: #ffffff; padding: 14px 40px; text-align: center; text-decoration: none; border-radius: 4px; font-size: 16px; font-weight: bold;">
+             Complete Registration
+          </a>
+          
+          <p style="margin-top: 20px; color: #ffffff;">If you didn't request to become a seller, please ignore this email or contact our support team.</p>
         </div>
       </div>
     </div>
   `;
 
-  await sendEmailWithResend(senderEmail, 'We’ve Received Your Consultancy Request', htmlMessage);
+  await sendEmailWithResend(email, 'Seller Request Confirmation', htmlMessage);
 }
