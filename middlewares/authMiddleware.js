@@ -2,39 +2,39 @@ import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 import Employee from '#models/userModels/employeeModel.js';
 import sellerModel from '#models/sellerModel.js';
-// import Customer from '#models/authModels/customerModel.js';
+import Customer from '#models/userModels/customerModel.js';
 
 const { verify } = jwt;
 
-// const protectForCustomer = asyncHandler(async (req, res, next) => {
+const protectForCustomer = asyncHandler(async (req, res, next) => {
 
-//     let token;
+    let token;
 
-//     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
        
-//         try {
+        try {
 
-//             token = req.headers.authorization.split(' ')[1];
+            token = req.headers.authorization.split(' ')[1];
 
-//             const decoded = verify(token, process.env.JWT_SECRET);
+            const decoded = verify(token, process.env.JWT_SECRET);
 
-//             req.customer = await Customer.findById(decoded.id).select('-password');
+            req.customer = await Customer.findById(decoded.id).select('-password');
 
-//             next();
+            next();
 
-//         } catch (error) {
-//             console.log(error);
-//             res.send(401);
-//             throw new Error('Not Authorized');
-//         }
-//     }
+        } catch (error) {
+            console.log(error);
+            res.send(401);
+            throw new Error('Not Authorized');
+        }
+    }
 
-//     if(!token) {
-//         res.status(401);
-//         throw new Error('Not authorized, no token');
-//     }
+    if(!token) {
+        res.status(401);
+        throw new Error('Not authorized, no token');
+    }
     
-// })
+})
 
 const protectForEmployee = asyncHandler(async (req, res, next) => {
 

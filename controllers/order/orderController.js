@@ -1,0 +1,152 @@
+import Order from '#models/order/orderModel.js';
+import Item from '#models/itemModel.js';
+import SellerStore from '#models/sellerStoreModel.js';
+import Customer from '#models/userModels/customerModel.js';
+
+// Create a new order
+export const createOrder = async (req, res) => {
+    try {
+        const {  sellerStoreId, totalAmount, paymentMethod, shippingDetails, products } = req.body;
+           const customerId = req.customer._id; 
+
+        const customer = await Customer.findById(customerId);
+        if (!customer) {
+            return res.status(400).json({ message: 'Customer not found' });
+        }
+
+        const sellerStore = await SellerStore.findById(sellerStoreId);
+        if (!sellerStore) {
+            return res.status(400).json({ message: 'Seller store not found' });
+        }
+
+        // Validate products
+        for (const product of products) {
+            const item = await Item.findById(product.item);
+            if (!item) {
+                return res.status(400).json({ message: `Item with id ${product.item} not found` });
+            }
+        }
+
+        // Create a new order document
+        const newOrder = new Order({
+            customer: customerId,
+            sellerStore: sellerStoreId,
+            totalAmount,
+            orderStatus: 'Pending', // Default status
+            paymentStatus: 'Pending', // Default status
+            paymentMethod,
+            shippingDetails,
+            products: products.map(product => ({
+                item: product.item,
+                quantity: product.quantity,
+                unitPrice: product.unitPrice,
+                totalPrice: product.totalPrice,
+                variant: product.variant
+            }))
+        });
+
+        // Save the new order
+        await newOrder.save();
+
+        return res.status(201).json({ message: 'Order created successfully', order: newOrder });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// Get all orders (optionally filtered by customer or seller)
+export const getOrders = async (req, res) => {
+    try {
+        const { customerId, sellerStoreId, orderStatus } = req.query;
+
+        const filter = {};
+
+        if (customerId) filter.customer = customerId;
+        if (sellerStoreId) filter.sellerStore = sellerStoreId;
+        if (orderStatus) filter.orderStatus = orderStatus;
+
+        const orders = await Order.find(filter)
+            .populate('customer', 'name email')  // Populate customer details
+            .populate('sellerStore', 'storeName')  // Populate seller store details
+            .populate('products.item', 'name price');  // Populate item details
+
+        return res.status(200).json({ orders });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// Get a single order by ID
+export const getOrderById = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await Order.findById(orderId)
+            .populate('customer', 'name email')
+            .populate('sellerStore', 'storeName')
+            .populate('products.item', 'name price');
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        return res.status(200).json({ order });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// Update order status
+export const updateOrderStatus = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { orderStatus, paymentStatus } = req.body;
+
+        // Ensure valid status values
+        const validOrderStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Completed'];
+        const validPaymentStatuses = ['Pending', 'Completed', 'Failed'];
+
+        if (orderStatus && !validOrderStatuses.includes(orderStatus)) {
+            return res.status(400).json({ message: 'Invalid order status' });
+        }
+
+        if (paymentStatus && !validPaymentStatuses.includes(paymentStatus)) {
+            return res.status(400).json({ message: 'Invalid payment status' });
+        }
+
+        const order = await Order.findByIdAndUpdate(orderId, {
+            orderStatus: orderStatus || undefined,
+            paymentStatus: paymentStatus || undefined
+        }, { new: true });
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        return res.status(200).json({ message: 'Order status updated successfully', order });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// Delete an order
+export const deleteOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await Order.findByIdAndDelete(orderId);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        return res.status(200).json({ message: 'Order deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
