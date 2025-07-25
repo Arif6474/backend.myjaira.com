@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 const { model, Schema } = mongoose;
 
 const orderSchema = Schema({
+    orderId: {
+        type: String,
+        required: true,
+        unique: true
+    },
     customer: {
         type: Schema.Types.ObjectId,
         ref: 'Customer',
@@ -28,7 +33,7 @@ const orderSchema = Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['Card', 'COD'],
+        enum: ['card', 'cod'],
         required: true
     },
     paymentDetails: {

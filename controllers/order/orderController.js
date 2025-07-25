@@ -2,6 +2,7 @@ import Order from '#models/order/orderModel.js';
 import Item from '#models/itemModel.js';
 import SellerStore from '#models/sellerStoreModel.js';
 import Customer from '#models/userModels/customerModel.js';
+import { generateCustomOrderId } from '#utils/orderId.js';
 
 // Create a new order
 export const createOrder = async (req, res) => {
@@ -29,6 +30,7 @@ export const createOrder = async (req, res) => {
 
         // Create a new order document
         const newOrder = new Order({
+            orderId: generateCustomOrderId(), // Generate a unique order ID
             customer: customerId,
             sellerStore: sellerStoreId,
             totalAmount,

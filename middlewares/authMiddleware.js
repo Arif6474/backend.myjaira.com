@@ -96,4 +96,4 @@ const protectForSeller = asyncHandler(async (req, res, next) => {
     
 })
 
-export { protectForEmployee, protectForSeller };
+export { protectForEmployee, protectForSeller, protectForCustomer};
