@@ -219,6 +219,7 @@ const getDocumentsWithQuery = async ({ model, req, res }) => {
                 { orderId: { $regex: searchQuery, $options: 'i' } },
                 { phone: { $regex: searchQuery, $options: 'i' } },
                 { questionText: { $regex: searchQuery, $options: 'i' } },
+                { isLinkOrImage: { $regex: searchQuery, $options: 'i' } },
                 
                 // { category: { $regex: searchQuery, $options: 'i' } },
             ]
