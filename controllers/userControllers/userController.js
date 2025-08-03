@@ -211,7 +211,7 @@ const loginWithGoogle = async (req, res) => {
 }
 
 const updateProfile = async (req, res) => {
-  const userId = req.user._id;
+  const userId = req.customer._id;
 
   const user = await User.findById(userId);
   if (!user) {

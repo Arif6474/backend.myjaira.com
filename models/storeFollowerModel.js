@@ -2,9 +2,9 @@ import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
 const storeFollowerSchema = new Schema({
-    store: {
+    sellerStore: {
         type: Schema.Types.ObjectId,
-        ref: 'Store',
+        ref: 'SellerStore',
         required: true,
     },
     follower: {

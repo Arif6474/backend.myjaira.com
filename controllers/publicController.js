@@ -3,6 +3,7 @@ import categoryModel from '#models/categoryModel.js'
 import itemModel from '#models/itemModel.js';
 import sellerStoreModel from '#models/sellerStoreModel.js';
 import storeCategoryModel from '#models/storeCategoryModel.js';
+import StoreFollower from '#models/storeFollowerModel.js';
 import storeItemSubcategoryModel from '#models/storeItemSubcategoryModel.js';
 import Testimonial from '#models/testimonialModel.js'
 import asyncHandler from 'express-async-handler'
@@ -128,9 +129,12 @@ const getStoreBySlug = asyncHandler(async (req, res) => {
 
     categories = await categoryModel.find(query).sort({ serial: 1 });
 
+    const sellerStoreProductsCount = await itemModel.countDocuments({ sellerStore: store._id, isActive: true });
+
     res.status(200).json({
         store,
         categories, // Full category objects (name, slug, etc.)
+        sellerStoreProductsCount, // Total number of products in this store
         // If you just need IDs or names, you can adjust the return
     });
 });
@@ -166,11 +170,22 @@ const getAllItemCategories = asyncHandler(async (req, res) => {
     res.status(200).json(categories);
 })
 
+const getStoreFollowersByStoreId = asyncHandler(async (req, res) => {
+    const { storeId } = req.params;
+    const followerCount = await StoreFollower.countDocuments({ sellerStore: storeId });
+    
+    if (!followerCount) {
+        return res.status(404).json({ message: 'No followers found for this store' });
+    }    
+    res.status(200).json(followerCount);
+})
+
 export {
     getHomePageData,
     getAllStores,
     getStoreBySlug,
     getStoreBySlugWithCategories,
     getAllStoreCategories,
-    getAllItemCategories
+    getAllItemCategories,
+    getStoreFollowersByStoreId
 }
