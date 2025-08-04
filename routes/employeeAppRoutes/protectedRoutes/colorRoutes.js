@@ -1,4 +1,4 @@
-import { upload } from '#utils/storage.js';
+
 import { Router } from 'express';
 
 import {
@@ -13,10 +13,10 @@ import {
 
 const router = Router();
 router.get('/', getAllColors);
-router.post('/', upload.fields([{ name: 'image' }]), createColor);
+router.post('/', createColor);
 router.get('/getColorWithQuery', getColorWithQuery);
 router.get('/getSingleColor/:id', getSingleColor);
-router.patch('/:id', upload.fields([{ name: 'image' }]), updateColor);
+router.patch('/:id', updateColor);
 router.delete('/:id', deleteColor);
 router.patch('/archiveColor/:id', archiveColor);
 

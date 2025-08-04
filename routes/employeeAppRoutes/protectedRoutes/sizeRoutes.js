@@ -1,4 +1,4 @@
-import { upload } from '#utils/storage.js';
+
 import { Router } from 'express';
 
 import {
@@ -13,10 +13,10 @@ import {
 
 const router = Router();
 router.get('/', getAllSizes);
-router.post('/', upload.fields([{ name: 'image' }]), createSize);
+router.post('/', createSize);
 router.get('/getSizeWithQuery', getSizeWithQuery);
 router.get('/getSingleSize/:id', getSingleSize);
-router.patch('/:id', upload.fields([{ name: 'image' }]), updateSize);
+router.patch('/:id', updateSize);
 router.delete('/:id', deleteSize);
 router.patch('/archiveSize/:id', archiveSize);
 
