@@ -21,10 +21,14 @@ const itemImageSchema = new Schema({
     image: {
         type: String,
     },
+    price: {
+        type: Number,
+    },
     isActive: {
         type: Boolean,
         default: true,
     },
+
     serial: {
         type: Number,
         default: 0,

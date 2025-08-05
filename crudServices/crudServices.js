@@ -220,6 +220,7 @@ const getDocumentsWithQuery = async ({ model, req, res }) => {
                 { phone: { $regex: searchQuery, $options: 'i' } },
                 { questionText: { $regex: searchQuery, $options: 'i' } },
                 { isLinkOrImage: { $regex: searchQuery, $options: 'i' } },
+                { size: { $regex: searchQuery, $options: 'i' } },
                 
                 // { category: { $regex: searchQuery, $options: 'i' } },
             ]
