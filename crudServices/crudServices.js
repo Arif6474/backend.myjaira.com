@@ -221,6 +221,7 @@ const getDocumentsWithQuery = async ({ model, req, res }) => {
                 { questionText: { $regex: searchQuery, $options: 'i' } },
                 { isLinkOrImage: { $regex: searchQuery, $options: 'i' } },
                 { size: { $regex: searchQuery, $options: 'i' } },
+                // { 'itemSize.size': { $regex: searchQuery, $options: 'i' } },
                 
                 // { category: { $regex: searchQuery, $options: 'i' } },
             ]
@@ -257,6 +258,8 @@ const getDocumentsWithQuery = async ({ model, req, res }) => {
         res.status(400).json({ error: error.message });
     }
 };
+
+
 
 export {
     getAllDocuments,
