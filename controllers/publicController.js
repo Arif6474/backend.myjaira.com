@@ -1,6 +1,8 @@
 
 import categoryModel from '#models/categoryModel.js'
+import itemImageModel from '#models/itemImageModel.js';
 import itemModel from '#models/itemModel.js';
+import itemSizeModel from '#models/itemSizeModel.js';
 import sellerStoreModel from '#models/sellerStoreModel.js';
 import storeCategoryModel from '#models/storeCategoryModel.js';
 import StoreFollower from '#models/storeFollowerModel.js';
@@ -124,7 +126,7 @@ const getStoreBySlug = asyncHandler(async (req, res) => {
 
     // 3. Get unique category IDs from those items
     const categoryIds = [...new Set(items.map(item => item.category?.toString()))].filter(Boolean);
-  
+
     const query = { _id: { $in: categoryIds }, isActive: true, };
 
     categories = await categoryModel.find(query).sort({ serial: 1 });
@@ -151,7 +153,7 @@ const getStoreBySlugWithCategories = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "Category not found" });
     }
 
-    const singleStoreItems = await itemModel.find({ sellerStore: singleStore._id, category: category._id, isActive: true}).populate('category').sort({ serial: 1 });
+    const singleStoreItems = await itemModel.find({ sellerStore: singleStore._id, category: category._id, isActive: true }).populate('category').sort({ serial: 1 });
 
     res.status(200).json({
         singleStore,
@@ -173,12 +175,38 @@ const getAllItemCategories = asyncHandler(async (req, res) => {
 const getStoreFollowersByStoreId = asyncHandler(async (req, res) => {
     const { storeId } = req.params;
     const followerCount = await StoreFollower.countDocuments({ sellerStore: storeId });
-    
+
     if (!followerCount) {
         return res.status(404).json({ message: 'No followers found for this store' });
-    }    
+    }
     res.status(200).json(followerCount);
 })
+const getSingleItemDetails = asyncHandler(async (req, res) => {
+    const { itemId } = req.params;
+
+    // Fetch the item details, populate 'sellerStore' and 'category'
+    const item = await itemModel.findById(itemId).populate('sellerStore category').exec();
+
+    if (!item) {
+        return res.status(404).json({ message: 'Item not found' });
+    }
+
+    // Fetch item images, populate 'color', and sort by 'serial'
+    const itemImages = await itemImageModel.find({ item: item._id, isActive: true }).populate('color').sort({ serial: 1 });
+
+    // Fetch item sizes, populate 'itemSize', and sort by 'serial' from the Size model
+    const itemSizes = await itemSizeModel.find({ item: item._id, isActive: true }).populate('itemSize');
+
+    // Sort itemSizes array by the 'serial' field of the populated 'itemSize' field
+    const sortedItemSizes = itemSizes.sort((a, b) => a.itemSize.serial - b.itemSize.serial);
+
+    // Send the response with the item, item images, and sorted item sizes
+    res.status(200).json({
+        item,
+        itemImages,
+        itemSizes: sortedItemSizes,
+    });
+});
 
 export {
     getHomePageData,
@@ -187,5 +215,6 @@ export {
     getStoreBySlugWithCategories,
     getAllStoreCategories,
     getAllItemCategories,
-    getStoreFollowersByStoreId
+    getStoreFollowersByStoreId,
+    getSingleItemDetails
 }

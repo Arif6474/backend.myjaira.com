@@ -30,6 +30,10 @@
         of: String,
         required: false,
     },
+    serial: {
+        type: Number,
+        default: 0,
+    },
     isActive: {
         type: Boolean,
         default: true,
