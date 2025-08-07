@@ -10,11 +10,12 @@ const itemSizeSchema = new Schema({
     itemSize: {
         type: Schema.Types.ObjectId,
         ref: 'Size',
+        required: true,
     },
-    // name: {
-    //     type: String,
-    //     // required: true,
-    // },
+    name: {
+        type: String,
+        default: '',
+    },
     isActive: {
         type: Boolean,
         default: true,

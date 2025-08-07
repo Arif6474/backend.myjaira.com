@@ -221,12 +221,12 @@ const getDocumentsWithQuery = async ({ model, req, res }) => {
                 { questionText: { $regex: searchQuery, $options: 'i' } },
                 { isLinkOrImage: { $regex: searchQuery, $options: 'i' } },
                 { size: { $regex: searchQuery, $options: 'i' } },
-                // { 'itemSize.size': { $regex: searchQuery, $options: 'i' } },
+                { 'itemSize.size': { $regex: searchQuery, $options: 'i' } },
                 
                 // { category: { $regex: searchQuery, $options: 'i' } },
             ]
         };
-
+   console.log(searchCondition, 'searchCondition'.yellow);
         Object.keys(filters).forEach(key => {
             if (filters[key]) {
                 searchCondition[key] = filters[key];
