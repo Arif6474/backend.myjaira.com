@@ -226,7 +226,7 @@ const getDocumentsWithQuery = async ({ model, req, res }) => {
                 // { category: { $regex: searchQuery, $options: 'i' } },
             ]
         };
-   console.log(searchCondition, 'searchCondition'.yellow);
+
         Object.keys(filters).forEach(key => {
             if (filters[key]) {
                 searchCondition[key] = filters[key];

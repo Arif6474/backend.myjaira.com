@@ -137,6 +137,7 @@ const getStoreBySlug = asyncHandler(async (req, res) => {
         store,
         categories, // Full category objects (name, slug, etc.)
         sellerStoreProductsCount, // Total number of products in this store
+        items
         // If you just need IDs or names, you can adjust the return
     });
 });
