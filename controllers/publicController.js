@@ -209,6 +209,32 @@ const getSingleItemDetails = asyncHandler(async (req, res) => {
     });
 });
 
+
+const getAllStoreItems= asyncHandler(async (req, res) => {
+    const { slug } = req.params;
+    const { sortBy } = req.query;
+
+    const store = await sellerStoreModel.findOne({ slug });
+    if (!store) {
+        return res.status(404).json({ message: "Store not found" });
+    }
+    let sortOptions = {};
+
+    if (sortBy === 'priceLowToHigh') {
+        sortOptions = { price: 1 };
+    } else if (sortBy === 'priceHighToLow') {
+        sortOptions = { price: -1 };
+    } else if (sortBy === 'newest') {
+        sortOptions = { createdAt: -1 };
+    } else if (sortBy === 'oldest') {
+        sortOptions = { createdAt: 1 };
+    }
+
+    const items = await itemModel.find({ sellerStore: store._id, isActive: true }).sort(sortOptions);
+
+    res.status(200).json(items);
+});
+
 export {
     getHomePageData,
     getAllStores,
@@ -217,5 +243,6 @@ export {
     getAllStoreCategories,
     getAllItemCategories,
     getStoreFollowersByStoreId,
-    getSingleItemDetails
+    getSingleItemDetails,
+    getAllStoreItems
 }
