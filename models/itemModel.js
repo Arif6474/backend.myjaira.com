@@ -10,6 +10,10 @@ const itemSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Category',
     },
+    sku: {
+        type: String,
+        unique: true,
+    },
     title: {
         type: String,
     },

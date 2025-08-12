@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { createOrder, getMyAllOrders, getMyOrderById,  } from '#controllers/order/orderController.js'
 import storeFollowerRoutes from './storeFollowerRoutes.js'
 import { updateProfile } from '#controllers/userControllers/userController.js'
+import wishlistRoutes from './wishlistRoutes.js'
 
 
 const protectedRoutes = Router()
@@ -10,6 +11,7 @@ protectedRoutes.get('/getMyAllOrders', getMyAllOrders)
 protectedRoutes.get('/getMyOrderById/:orderId', getMyOrderById)
 protectedRoutes.patch('/updateProfile', updateProfile)
 protectedRoutes.use('/storeFollower', storeFollowerRoutes)
+protectedRoutes.use('/wishlists', wishlistRoutes)
 
 
 

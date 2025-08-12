@@ -23,8 +23,8 @@ const orderSchema = Schema({
     },
     orderStatus: {
         type: String,
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Completed'],
-        default: 'Pending'
+        enum: [ 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Completed'],
+        default: 'Processing'
     },
     paymentStatus: {
         type: String,
@@ -55,7 +55,8 @@ const orderSchema = Schema({
             variant: { type: String },  // Optional: variant information (e.g., color, size)
         }
     ]
-});
+},
+ { timestamps: true });
 
 export default model('Order', orderSchema);
 
