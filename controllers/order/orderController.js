@@ -7,8 +7,8 @@ import { generateCustomOrderId } from '#utils/orderId.js';
 // Create a new order
 export const createOrder = async (req, res) => {
     try {
-        const {  sellerStoreId, totalAmount, paymentMethod, shippingDetails, products } = req.body;
-           const customerId = req.customer._id; 
+        const { sellerStoreId, totalAmount, paymentMethod, shippingDetails, products } = req.body;
+        const customerId = req.customer._id;
 
         const customer = await Customer.findById(customerId);
         if (!customer) {
@@ -147,6 +147,46 @@ export const deleteOrder = async (req, res) => {
         }
 
         return res.status(200).json({ message: 'Order deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const getMyAllOrders = async (req, res) => {
+    try {
+        const customerId = req.customer._id;
+
+        const orders = await Order.find({ customer: customerId })
+            .populate('sellerStore', 'storeName')
+            .populate('products');
+
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ message: 'No orders found for this customer' });
+        }
+
+        return res.status(200).json({ orders });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+}
+
+export const getMyOrderById = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const customerId = req.customer._id;
+
+        const order = await Order.findOne({ _id: orderId, customer: customerId })
+            .populate('sellerStore', 'storeName')
+            .populate('products');
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found for this customer' });
+        }
+
+        return res.status(200).json({ order });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server error' });

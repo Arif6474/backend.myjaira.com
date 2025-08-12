@@ -1,11 +1,13 @@
 import { Router } from 'express'
-import { createOrder,  } from '#controllers/order/orderController.js'
+import { createOrder, getMyAllOrders, getMyOrderById,  } from '#controllers/order/orderController.js'
 import storeFollowerRoutes from './storeFollowerRoutes.js'
 import { updateProfile } from '#controllers/userControllers/userController.js'
 
 
 const protectedRoutes = Router()
 protectedRoutes.post('/createOrder', createOrder)
+protectedRoutes.get('/getMyAllOrders', getMyAllOrders)
+protectedRoutes.get('/getMyOrderById/:orderId', getMyOrderById)
 protectedRoutes.patch('/updateProfile', updateProfile)
 protectedRoutes.use('/storeFollower', storeFollowerRoutes)
 
