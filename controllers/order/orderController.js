@@ -159,7 +159,7 @@ export const getMyAllOrders = async (req, res) => {
 
         const orders = await Order.find({ customer: customerId })
             .populate('sellerStore', 'storeName')
-            .populate('products');
+            .populate('products.item');
 
         if (!orders || orders.length === 0) {
             return res.status(404).json({ message: 'No orders found for this customer' });
