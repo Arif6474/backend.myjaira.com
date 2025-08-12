@@ -58,7 +58,7 @@ const checkItemWishlist = asyncHandler(async(req, res) => {
     const { item } = req.query;
     const userId = req.customer._id;
 
-    const existing = await Wishlist.findOne({ customer: userId, item, isActive: true });
+    const existing = await Wishlist.findOne({ customer: userId, item: item, isActive: true });
 
     res.status(200).json({ isFavorited: !!existing });
 })
