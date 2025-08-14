@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import newsletterRoutes from './newsletterRoutes.js'
 
-import { getAllStores, getHomePageData, getStoreBySlug, getStoreBySlugWithCategories, getAllStoreCategories, getAllItemCategories, getStoreFollowersByStoreId, getSingleItemDetails, getAllStoreItems } from '#controllers/publicController.js'
+import { getAllStores, getHomePageData, getStoreBySlug, getStoreBySlugWithCategories, getAllStoreCategories, getAllItemCategories, getStoreFollowersByStoreId, getSingleItemDetails, getAllStoreItems, getAllItemsWithSearch, getSingleItemBySlug } from '#controllers/publicController.js'
 import authRoutes from './authRoutes/authRoutes.js'
 import { createSellerRequest } from '#controllers/sellerRequestController.js'
 
@@ -20,6 +20,8 @@ publicRoutes.get('/getStoreFollowersByStoreId/:storeId', getStoreFollowersByStor
 publicRoutes.get('/getStoreBySlugWithCategories/:storeSlug/:categorySlug', getStoreBySlugWithCategories)
 publicRoutes.get('/getSingleItemDetails/:itemId', getSingleItemDetails)
 publicRoutes.get('/getAllStoreItems/:slug', getAllStoreItems)
+publicRoutes.get('/getAllItemsWithSearch', getAllItemsWithSearch)
+publicRoutes.get('/getSingleItemBySlug/:slug', getSingleItemBySlug)
 
 
 export default publicRoutes 

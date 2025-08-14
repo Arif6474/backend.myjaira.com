@@ -17,6 +17,14 @@ const itemSchema = new Schema({
     title: {
         type: String,
     },
+    weight: {
+        type: Number,
+        default: 0,
+    },
+    weightPrice: {
+        type: Number,
+        default: 0,
+    },
     slug: {
         type: String,
         unique: true,

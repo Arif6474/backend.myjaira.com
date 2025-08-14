@@ -235,6 +235,34 @@ const getAllStoreItems= asyncHandler(async (req, res) => {
     res.status(200).json(items);
 });
 
+const getAllItemsWithSearch = asyncHandler(async (req, res) => {
+    const { searchQuery } = req.query;
+
+    if (!searchQuery) {
+        return res.status(400).json({ message: "Search query is required" });
+    }
+
+    const items = await itemModel.find({
+        title: { $regex: searchQuery, $options: 'i' },
+        isActive: true
+    }).populate('sellerStore category').sort({ createdAt: -1 });
+
+    if (items.length === 0) {
+        return res.status(404).json({ message: "No items found" });
+    }
+
+    res.status(200).json(items);
+});
+const getSingleItemBySlug = asyncHandler(async (req, res) => {
+    const { slug } = req.params;
+
+    const item = await itemModel.findOne({ slug })
+
+    if (!item) {
+        return res.status(404).json({ message: 'Item not found' });
+    }
+    res.status(200).json(item);
+});
 export {
     getHomePageData,
     getAllStores,
@@ -244,5 +272,7 @@ export {
     getAllItemCategories,
     getStoreFollowersByStoreId,
     getSingleItemDetails,
-    getAllStoreItems
+    getAllStoreItems,
+    getAllItemsWithSearch,
+    getSingleItemBySlug
 }
