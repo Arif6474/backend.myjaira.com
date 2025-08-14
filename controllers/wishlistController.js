@@ -65,12 +65,23 @@ const checkItemWishlist = asyncHandler(async(req, res) => {
 
 const getMyWishlists = asyncHandler(async (req, res) => {
     const userId = req.customer._id;
-    const wishlists = await Wishlist.find({ customer: userId, isActive: true }).populate('item').select('item -_id');
-    if (!wishlists) {
+    const wishlists = await Wishlist.find({ customer: userId, isActive: true })
+        .populate({
+            path: 'item',
+            populate: {
+                path: 'sellerStore',  // populate sellerStore within the item
+                model: 'SellerStore'  // specify the model to populate
+            }
+        })
+        .select('item -_id');
+
+    if (!wishlists || wishlists.length === 0) {
         return res.status(404).json({ message: 'No wishlists found for this user' });
     }
+
     res.status(200).json(wishlists);
-})
+});
+
 
 export {
     getAllWishlists,
