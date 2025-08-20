@@ -3,6 +3,7 @@ import Item from '#models/itemModel.js';
 import SellerStore from '#models/sellerStoreModel.js';
 import Customer from '#models/userModels/customerModel.js';
 import { generateCustomOrderId } from '#utils/orderId.js';
+import mongoose from 'mongoose';
 
 // Create a new order
 export const createOrder = async (req, res) => {
@@ -193,25 +194,33 @@ export const getMyOrderById = async (req, res) => {
     }
 };
 
+
 export const getSellerStoreOrderCountByStatus = async (req, res) => {
     try {
-        const sellerStoreId = req.params;
+        // Access sellerStoreId from the request params
+        const { sellerStoreId } = req.params;
+        
+        // Ensure sellerStoreId is an ObjectId (converting from string if necessary)
+        const sellerStoreObjectId = new mongoose.Types.ObjectId(sellerStoreId); // No 'new' required
 
+        // Aggregation to get order counts by status
         const orderCounts = await Order.aggregate([
-            { $match: { sellerStore: sellerStoreId } },
+            { $match: { sellerStore: sellerStoreObjectId } }, // Match orders for the sellerStore
             {
                 $group: {
-                    _id: '$orderStatus',
-                    count: { $sum: 1 }
+                    _id: '$orderStatus', // Group by order status
+                    count: { $sum: 1 } // Count the number of orders per status
                 }
             }
         ]);
 
+        // Prepare the result object with order statuses as keys and counts as values
         const result = orderCounts.reduce((acc, curr) => {
             acc[curr._id] = curr.count;
             return acc;
         }, {});
 
+        // Return the result
         return res.status(200).json({ orderCounts: result });
     } catch (error) {
         console.error(error);
@@ -232,7 +241,7 @@ export const getSellerStoreOrdersByStatus = async (req, res) => {
             return res.status(404).json({ message: 'No orders found for this seller store with the specified status' });
         }
 
-        return res.status(200).json({ orders });
+        return res.status(200).json(orders);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server error' });
@@ -265,6 +274,26 @@ export const updateOrderStatusById = async (req, res) => {
         }
 
         return res.status(200).json({ message: 'Order status updated successfully', order });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const getSingleOrder = async (req, res) => {
+    try {   
+        const { orderId } = req.params;
+
+        const order = await Order.findById(orderId)
+            .populate('customer',)
+            .populate('sellerStore', 'storeName')
+            .populate('products.item');
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        return res.status(200).json({ order });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server error' });
