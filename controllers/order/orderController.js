@@ -192,3 +192,81 @@ export const getMyOrderById = async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const getSellerStoreOrderCountByStatus = async (req, res) => {
+    try {
+        const sellerStoreId = req.params;
+
+        const orderCounts = await Order.aggregate([
+            { $match: { sellerStore: sellerStoreId } },
+            {
+                $group: {
+                    _id: '$orderStatus',
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const result = orderCounts.reduce((acc, curr) => {
+            acc[curr._id] = curr.count;
+            return acc;
+        }, {});
+
+        return res.status(200).json({ orderCounts: result });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const getSellerStoreOrdersByStatus = async (req, res) => {
+    try {
+        const { sellerStoreId, orderStatus } = req.params;
+
+        const orders = await Order.find({ sellerStore: sellerStoreId, orderStatus })
+            .populate('customer')
+            .populate('products.item')
+            .sort({ createdAt: -1 }); // Sort by creation date, most recent first
+
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ message: 'No orders found for this seller store with the specified status' });
+        }
+
+        return res.status(200).json({ orders });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+}
+
+export const updateOrderStatusById = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { orderStatus } = req.body;
+
+        // Validate status values
+        const validOrderStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Completed'];
+        const validPaymentStatuses = ['Pending', 'Completed', 'Failed'];
+
+        if (orderStatus && !validOrderStatuses.includes(orderStatus)) {
+            return res.status(400).json({ message: 'Invalid order status' });
+        }
+
+        // if (paymentStatus && !validPaymentStatuses.includes(paymentStatus)) {
+        //     return res.status(400).json({ message: 'Invalid payment status' });
+        // }
+
+        const order = await Order.findByIdAndUpdate(orderId, {
+            orderStatus: orderStatus || undefined
+        }, { new: true });
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        return res.status(200).json({ message: 'Order status updated successfully', order });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
