@@ -237,9 +237,6 @@ export const getSellerStoreOrdersByStatus = async (req, res) => {
             .populate('products.item')
             .sort({ createdAt: -1 }); // Sort by creation date, most recent first
 
-        if (!orders || orders.length === 0) {
-            return res.status(404).json({ message: 'No orders found for this seller store with the specified status' });
-        }
 
         return res.status(200).json(orders);
     } catch (error) {
