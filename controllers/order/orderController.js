@@ -4,6 +4,7 @@ import SellerStore from '#models/sellerStoreModel.js';
 import Customer from '#models/userModels/customerModel.js';
 import { generateCustomOrderId } from '#utils/orderId.js';
 import mongoose from 'mongoose';
+import { createConsignmentAutoAWB } from './shopifyDelivery.js';
 
 // Create a new order
 export const createOrder = async (req, res) => {
@@ -50,6 +51,16 @@ export const createOrder = async (req, res) => {
 
         // Save the new order
         await newOrder.save();
+
+        // Optional: auto-forward on creation when COD or already paid
+        const isCOD = String(paymentMethod).toLowerCase() === 'cod';
+        const paid = newOrder.paymentStatus === 'Completed';
+        if (isCOD || paid) {
+            // do not block response
+            createConsignmentAutoAWB(newOrder._id).catch(err => {
+                console.error("Auto-forward failed:", err.message);
+            });
+        }
 
         return res.status(201).json({ message: 'Order created successfully', order: newOrder });
     } catch (error) {
@@ -199,7 +210,7 @@ export const getSellerStoreOrderCountByStatus = async (req, res) => {
     try {
         // Access sellerStoreId from the request params
         const { sellerStoreId } = req.params;
-        
+
         // Ensure sellerStoreId is an ObjectId (converting from string if necessary)
         const sellerStoreObjectId = new mongoose.Types.ObjectId(sellerStoreId); // No 'new' required
 
@@ -278,7 +289,7 @@ export const updateOrderStatusById = async (req, res) => {
 };
 
 export const getSingleOrder = async (req, res) => {
-    try {   
+    try {
         const { orderId } = req.params;
 
         const order = await Order.findById(orderId)
