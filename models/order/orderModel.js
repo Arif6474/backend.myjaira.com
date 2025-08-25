@@ -47,6 +47,7 @@ const orderSchema = Schema({
 
     // Optional recipient extras (helpful for courier payload)
     recipientName: { type: String },
+    email: { type: String },
     phone: { type: String },
     city: { type: String },
     area: { type: String },
