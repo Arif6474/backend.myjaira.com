@@ -52,15 +52,6 @@ export const createOrder = async (req, res) => {
         // Save the new order
         await newOrder.save();
 
-        // Optional: auto-forward on creation when COD or already paid
-        const isCOD = String(paymentMethod).toLowerCase() === 'cod';
-        const paid = newOrder.paymentStatus === 'Completed';
-        if (isCOD || paid) {
-            // do not block response
-            createConsignmentAutoAWB(newOrder._id).catch(err => {
-                console.error("Auto-forward failed:", err.message);
-            });
-        }
 
         return res.status(201).json({ message: 'Order created successfully', order: newOrder });
     } catch (error) {
@@ -307,3 +298,25 @@ export const getSingleOrder = async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const forwardOrderToShopifyDelivery = async (req, res) => {
+
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId)
+
+    if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+    }
+
+    if (order.orderStatus !== 'Processing' && order.orderStatus !== 'Pending') {
+        return res.status(400).json({ message: 'Only orders with status "Processing" or "Pending" can be forwarded to delivery.' });
+    }
+    console.log("order in forwardOrderToShopifyDelivery", order);
+
+    const { awb, labelPdf } = await createConsignmentAutoAWB(orderId);
+
+    res.status(200).json({ message: 'Order forwarded to Shopify Delivery successfully', awb, labelPdf });
+
+
+}

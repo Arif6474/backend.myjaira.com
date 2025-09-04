@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getSellerStoreOrderCountByStatus, getSellerStoreOrdersByStatus, getSingleOrder, updateOrderStatusById } from '#controllers/order/orderController.js'
+import { forwardOrderToShopifyDelivery, getSellerStoreOrderCountByStatus, getSellerStoreOrdersByStatus, getSingleOrder, updateOrderStatusById } from '#controllers/order/orderController.js'
 
 
 const orderRoutes = Router()
@@ -8,6 +8,8 @@ orderRoutes.get('/getSellerStoreOrderCountByStatus/:sellerStoreId', getSellerSto
 orderRoutes.get('/getSellerStoreOrdersByStatus/:sellerStoreId/:orderStatus', getSellerStoreOrdersByStatus)
 orderRoutes.patch('/updateOrderStatusById/:orderId', updateOrderStatusById)
 orderRoutes.get('/getSingleOrder/:orderId', getSingleOrder)
+orderRoutes.patch('/forwardOrderToShopifyDelivery/:orderId', forwardOrderToShopifyDelivery)
+
 
 
 export default orderRoutes
